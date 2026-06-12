@@ -1,6 +1,13 @@
 import { API } from './api.js';
 import { showToast, showLoader, hideLoader } from './ui.js';
 
+// Helper to format currency in COP without decimals
+function formatPrice(price) {
+  if (price === undefined || price === null) return '$0';
+  const rounded = Math.round(Number(price));
+  return '$' + rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 // ==========================================
 // STATE MANAGEMENT
 // ==========================================
@@ -489,7 +496,7 @@ async function renderHome() {
                   ${prod.description}
                 </p>
                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                  <span class="fs-5 fw-bold text-primary">$${prod.price.toFixed(2)}</span>
+                  <span class="fs-5 fw-bold text-primary">${formatPrice(prod.price)}</span>
                   <a href="#/product/${prod._id}" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" title="Ver Detalle">
                     <i class="fa-solid fa-eye"></i>
                   </a>
@@ -686,7 +693,7 @@ async function renderCatalog(queryParams = {}) {
                       ${prod.description}
                     </p>
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                      <span class="fs-5 fw-bold text-primary">$${prod.price.toFixed(2)}</span>
+                      <span class="fs-5 fw-bold text-primary">${formatPrice(prod.price)}</span>
                       <a href="#/product/${prod._id}" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;" title="Ver Detalle">
                         <i class="fa-solid fa-eye"></i>
                       </a>
@@ -798,7 +805,7 @@ async function renderProductDetail(id) {
               </span>
               <h1 class="fw-bold mb-2">${prod.name}</h1>
               <div class="d-flex align-items-center gap-3 mb-4">
-                <span class="h2 text-primary fw-bold mb-0">$${prod.price.toFixed(2)}</span>
+                <span class="h2 text-primary fw-bold mb-0">${formatPrice(prod.price)}</span>
                 
                 ${outOfStock ? 
                   `<span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fa-solid fa-times-circle me-1"></i>Agotado</span>` : 
@@ -939,7 +946,7 @@ function renderCart() {
                           </div>
                         </div>
                       </td>
-                      <td class="text-center fw-medium">$${item.price.toFixed(2)}</td>
+                      <td class="text-center fw-medium">${formatPrice(item.price)}</td>
                       <td class="text-center">
                         <div class="d-flex align-items-center justify-content-center border border-light rounded-pill mx-auto" style="width: fit-content; max-width: 120px; background-color: var(--bg-main);">
                           <button class="btn btn-sm px-2 text-dark border-0" onclick="app.updateCartQty('${item.productId}', ${item.quantity - 1})"><i class="fa-solid fa-minus fs-8"></i></button>
@@ -947,7 +954,7 @@ function renderCart() {
                           <button class="btn btn-sm px-2 text-dark border-0" onclick="app.updateCartQty('${item.productId}', ${item.quantity + 1})"><i class="fa-solid fa-plus fs-8"></i></button>
                         </div>
                       </td>
-                      <td class="text-end fw-bold text-dark">$${(item.price * item.quantity).toFixed(2)}</td>
+                      <td class="text-end fw-bold text-dark">${formatPrice(item.price * item.quantity)}</td>
                       <td class="text-center">
                         <button class="btn btn-link text-danger p-1" onclick="app.removeFromCart('${item.productId}')">
                           <i class="fa-solid fa-trash"></i>
@@ -968,21 +975,21 @@ function renderCart() {
             <h5 class="fw-bold mb-4">Resumen del Pedido</h5>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Subtotal (${count} items)</span>
-              <span class="fw-medium">$${total.toFixed(2)}</span>
+              <span class="fw-medium">${formatPrice(total)}</span>
             </div>
             <div class="d-flex justify-content-between mb-3">
               <span class="text-muted">Envío</span>
-              <span class="fw-medium text-success">${shippingFee === 0 ? 'Gratis' : `$${shippingFee.toFixed(2)}`}</span>
+              <span class="fw-medium text-success">${shippingFee === 0 ? 'Gratis' : formatPrice(shippingFee)}</span>
             </div>
             ${shippingFee > 0 ? `
               <div class="alert alert-warning py-2 rounded-3 small mb-3">
-                <i class="fa-solid fa-circle-info me-1"></i>Agrega <strong>$${(50 - total).toFixed(2)}</strong> más para envío gratuito.
+                <i class="fa-solid fa-circle-info me-1"></i>Agrega <strong>${formatPrice(50 - total)}</strong> más para envío gratuito.
               </div>
             ` : ''}
             <hr class="border-light my-3">
             <div class="d-flex justify-content-between mb-4">
               <span class="fw-bold text-dark fs-5">Total</span>
-              <span class="fw-bold text-primary fs-5">$${grandTotal.toFixed(2)}</span>
+              <span class="fw-bold text-primary fs-5">${formatPrice(grandTotal)}</span>
             </div>
 
             <!-- Checkout actions -->
@@ -1401,7 +1408,7 @@ async function renderProfile() {
                             <td class="fw-bold text-dark">${order._id.substring(0, 8)}...</td>
                             <td class="text-muted">${formattedDate}</td>
                             <td><span class="badge ${badgeColor}">${order.status}</span></td>
-                            <td class="fw-bold">$${order.total.toFixed(2)}</td>
+                            <td class="fw-bold">${formatPrice(order.total)}</td>
                             <td class="text-center">
                               <button class="btn btn-sm btn-light border py-1 px-3 rounded-pill text-nowrap">
                                 <i class="fa-solid fa-eye me-1"></i>Ver Detalle
@@ -1425,16 +1432,16 @@ async function renderProfile() {
                                             <img src="${item.imageUrl || 'https://via.placeholder.com/50'}" class="rounded border" style="width: 40px; height: 40px; object-fit: cover;">
                                             <div>
                                               <span class="fw-medium text-dark d-block small">${item.name}</span>
-                                              <span class="text-muted small">$${item.price.toFixed(2)} x ${item.quantity}</span>
+                                              <span class="text-muted small">${formatPrice(item.price)} x ${item.quantity}</span>
                                             </div>
                                           </div>
-                                          <span class="fw-bold text-dark small">$${(item.price * item.quantity).toFixed(2)}</span>
+                                          <span class="fw-bold text-dark small">${formatPrice(item.price * item.quantity)}</span>
                                         </div>
                                       `).join('')}
                                     </div>
                                     <div class="d-flex justify-content-between pt-2 border-top">
                                       <span class="fw-bold text-dark">Total pagado:</span>
-                                      <span class="fw-bold text-primary fs-5">$${order.total.toFixed(2)}</span>
+                                      <span class="fw-bold text-primary fs-5">${formatPrice(order.total)}</span>
                                     </div>
                                   </div>
 
@@ -1593,7 +1600,7 @@ async function renderAdmin() {
             <div class="metric-card bg-primary text-white">
               <div>
                 <h6 class="text-white-50 mb-1">Ventas Entregadas</h6>
-                <h3 class="fw-bold mb-0">$${stats.totalSales ? stats.totalSales.toFixed(2) : '0.00'}</h3>
+                <h3 class="fw-bold mb-0">${stats.totalSales ? formatPrice(stats.totalSales) : '$0'}</h3>
               </div>
               <div class="icon-wrapper bg-white text-primary"><i class="fa-solid fa-sack-dollar"></i></div>
             </div>
@@ -1647,7 +1654,7 @@ async function renderAdmin() {
                     <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-light">
                       <div>
                         <span class="fw-bold text-dark d-block small">${p.name}</span>
-                        <span class="text-muted small">Precio: $${p.price.toFixed(2)}</span>
+                        <span class="text-muted small">Precio: ${formatPrice(p.price)}</span>
                       </div>
                       <span class="badge bg-danger rounded-pill px-3 py-2">Stock: ${p.stock}</span>
                     </div>
@@ -1683,7 +1690,7 @@ async function renderAdmin() {
                           <td class="fw-bold text-dark small">${o._id.substring(0, 8)}...</td>
                           <td class="small text-muted">${o.clientName}</td>
                           <td><span class="badge ${badge} fs-8">${o.status}</span></td>
-                          <td class="fw-bold text-end small">$${o.total.toFixed(2)}</td>
+                          <td class="fw-bold text-end small">${formatPrice(o.total)}</td>
                         </tr>
                       `;
                     }).join('')}
@@ -1777,7 +1784,7 @@ async function renderAdmin() {
                   </td>
                   <td class="fw-semibold text-dark">${p.name}</td>
                   <td><span class="badge bg-secondary-subtle text-dark">${p.category}</span></td>
-                  <td class="fw-bold text-primary">$${p.price.toFixed(2)}</td>
+                  <td class="fw-bold text-primary">${formatPrice(p.price)}</td>
                   <td class="text-center">
                     <span class="badge ${p.stock <= 3 ? 'bg-danger' : 'bg-success'}">${p.stock}</span>
                   </td>
@@ -2038,7 +2045,7 @@ async function renderAdmin() {
                     <td class="text-muted small">${oDate}</td>
                     <td class="small text-muted">${order.paymentMethod}</td>
                     <td><span class="badge ${badgeColor}">${order.status}</span></td>
-                    <td class="fw-bold text-end">$${order.total.toFixed(2)}</td>
+                    <td class="fw-bold text-end">${formatPrice(order.total)}</td>
                     <td class="text-center" onclick="event.stopPropagation();">
                       <div class="d-flex align-items-center gap-1 justify-content-center">
                         <select class="form-select form-select-sm py-1 bg-light border-0" id="order-status-select-${order._id}" style="width: 110px; font-size: 0.8rem;">
@@ -2068,16 +2075,16 @@ async function renderAdmin() {
                                     <img src="${item.imageUrl || 'https://via.placeholder.com/50'}" class="rounded border" style="width: 35px; height: 35px; object-fit: cover;">
                                     <div>
                                       <span class="fw-medium text-dark d-block small">${item.name}</span>
-                                      <span class="text-muted small">$${item.price.toFixed(2)} x ${item.quantity}</span>
+                                      <span class="text-muted small">${formatPrice(item.price)} x ${item.quantity}</span>
                                     </div>
                                   </div>
-                                  <span class="fw-bold text-dark small">$${(item.price * item.quantity).toFixed(2)}</span>
+                                  <span class="fw-bold text-dark small">${formatPrice(item.price * item.quantity)}</span>
                                 </div>
                               `).join('')}
                             </div>
                             <div class="d-flex justify-content-between pt-2 border-top">
                               <strong class="text-dark">Subtotal:</strong>
-                              <strong class="text-primary fs-5">$${order.total.toFixed(2)}</strong>
+                              <strong class="text-primary fs-5">${formatPrice(order.total)}</strong>
                             </div>
                           </div>
 
