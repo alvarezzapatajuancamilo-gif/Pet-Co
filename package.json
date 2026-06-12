@@ -1,0 +1,5 @@
+{
+  "name": "petshop-virtual-deprecated",
+  "description": "This Node.js project is deprecated. The application runs as a serverless SPA directly from public/index.html.",
+  "private": true
+}
